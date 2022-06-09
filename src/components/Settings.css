@@ -1,0 +1,5 @@
+.settings-template .content-block {
+    border-bottom-style: solid;
+    border-bottom-width: 1px;
+    border-bottom-color: var(--custom-dark-300);
+}

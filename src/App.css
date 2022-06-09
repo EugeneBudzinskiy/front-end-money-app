@@ -1,38 +1,68 @@
-.App {
+.vr {
+  opacity: 0.9;
+  width: 2px;
+  background-color: var(--custom-white-300);
+  border-radius: 1px;
+}
+
+.table-header,
+.graph-header {
+  color: var(--custom-purple-200);
+  font-size: 30px;
+}
+
+.row {
+  border-bottom-color: var(--custom-dark-300);
+  border-bottom-width: 1px;
+  border-bottom-style: solid;
+}
+
+.row:hover {
+  background-color: var(--custom-dark-200);
+}
+
+.table-content .sign {
+  display: inline-block;
+  width: 15px;
   text-align: center;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+.modal .modal-content {
+  background-color: var(--custom-dark-100);
+  padding: 10px 15px;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+.modal .modal-header,
+.modal .modal-footer {
+  border: none;
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+.modal .popup-btn,
+.form-container .btn{
+  background-color: var(--custom-dark-300);
+  border: none;
 }
 
-.App-link {
-  color: #61dafb;
+.modal .popup-btn:hover {
+  background-color: var(--custom-purple-100);
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.form-control,
+.form-control:focus {
+  background-color: inherit;
+  box-shadow: none;
+  border-color: var(--custom-dark-300);
+  color: var(--custom-white-100);
+}
+
+.form-control:focus {
+  border-color: var(--custom-purple-100);
+}
+
+.form-control::placeholder {
+  color: var(--custom-purple-200);
+}
+
+.table-content .comment {
+  text-align: justify;
 }
