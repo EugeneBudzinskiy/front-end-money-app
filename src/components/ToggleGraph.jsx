@@ -2,41 +2,95 @@ import './ToggleGraph.css';
 
 import { VictoryBar, VictoryLine, VictoryChart, VictoryAxis, VictoryTheme } from 'victory';
 
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import Button from "react-bootstrap/Button";
+import {useApi} from "../utilites/ApiProvider.tsx";
+import {NotificationManager} from "react-notifications";
+import {useSession} from "../utilites/Session.jsx";
 
-function Graph(props) {
-    if (!props.showState) {return null}
-
+function Graph() {
+    const api = useApi()
+    const {isAuthenticated} = useSession()
+    const [loginMessage, setLoginMessage] = useState(true)
     const baseColor = '#f4f5f6';
     const barColor = '#8190f3';
     const incomeColor = '#00ff00';
     const costsColor = '#ff0000';
+    const [isLoaded,setIsLoaded] = useState(false)
+    const [dataCategorySpends, setDataCategorySpends] =useState([])
 
-    const dataCategorySpends = [
-        {quarter: 1, earnings: 13000},
-        {quarter: 2, earnings: 16500},
-        {quarter: 3, earnings: 14250},
-        {quarter: 4, earnings: 19000}
-    ];
+    const [dataCostsLine, setDataCostsLine] =useState([])
 
-    const dataCostsLine = [
-        { x: 1, y: 2 },
-        { x: 2, y: 3 },
-        { x: 3, y: 5 },
-        { x: 4, y: 4 },
-        { x: 5, y: 7 }
-    ];
 
-    const dataIncomeLine = [
-        { x: 1, y: 3 },
-        { x: 2, y: 4 },
-        { x: 3, y: 6 },
-        { x: 4, y: 5 },
-        { x: 5, y: 8 }
-    ];
+    const [dataIncomeLine,setDataIncomeLine] = useState([])
+
+
+    const handleResponse = (response) => {
+        const myDataCostsLine = response.data.costs_line.map(
+            (cost_line) => ({
+                ...cost_line,
+                x: `${cost_line["date"]}`,
+                y: parseInt(`${cost_line["total"]}`, 10),
+            })
+        );
+        const myDataIncomesLine = response.data.incomes_line.map(
+            (income_line) => ({
+                ...income_line,
+                x: `${income_line["date"]}`,
+                y: parseInt(`${income_line["total"]}`, 10),
+            })
+        );
+        const myDataCategorySpends = response.data.category_spend.map(
+            (spend) => ({
+                ...spend,
+                quarter: `${spend["category"]}`,
+                earnings: parseInt(`${spend["total"]}`, 10),
+            })
+        );
+
+        setDataCategorySpends(myDataCategorySpends);
+        setDataIncomeLine(myDataIncomesLine);
+        setDataCostsLine(myDataCostsLine);
+        setIsLoaded(true);
+    };
+
+    useEffect(() => {
+        if (!isAuthenticated() && loginMessage){
+            NotificationManager.info("Log in please to see your data", "Log In Please")
+            setDataIncomeLine([
+                { x: "1", y: 3 },
+                { x: "2", y: 4 },
+                { x: "3", y: 6 },
+                { x: "4", y: 5 },
+                { x: "5", y: 8 },
+                {x: "6", y: 10}
+            ])
+            setDataCostsLine( [
+                { x: "1", y: 2 },
+                { x: "2", y: 3 },
+                { x: "3", y: 5 },
+                { x: "4", y: 4 },
+                { x: "5", y: 7 },
+                {x: "6", y: 20}
+            ])
+            setDataCategorySpends([
+                    {quarter: "Shop", earnings: 13000},
+                    {quarter: "Restaurant", earnings: 16500},
+                    {quarter: "Coffee", earnings: 14250},
+                    {quarter: "Games", earnings: 19000}
+                ])
+
+            setLoginMessage(false)
+        }
+        if (!isLoaded) {
+            api.get(`/v1/statistic/data_analytics`).then((response) => {
+                handleResponse(response);
+            });
+        }
+    }, [dataIncomeLine,dataCostsLine,dataCategorySpends]);
 
     return (
+        <>
         <div className="d-flex justify-content-center">
             <div className='d-flex flex-lg-row flex-column'>
                 <VictoryChart
@@ -49,8 +103,8 @@ function Graph(props) {
                             axis: {stroke: baseColor},
                             tickLabels: {fill: baseColor}
                         }}
-                        tickValues={[1, 2, 3, 4]}
-                        tickFormat={["Shop", "Restaurant", "Coffee", "Games"]}
+                        tickValues={dataCategorySpends}
+
                     />
                     <VictoryAxis
                         dependentAxis
@@ -93,10 +147,12 @@ function Graph(props) {
                 </VictoryChart>
             </div>
         </div>
+        </>
     );
 }
 
 class ToggleGraph extends React.Component {
+
     constructor(props) {
         super(props);
         this.state = {showState: false};
@@ -117,8 +173,8 @@ class ToggleGraph extends React.Component {
                 </Button>
 
                 <div className={ this.state.showState ? 'graph-wrapper show-graph' : 'graph-wrapper' }>
-                    <Graph showState={ this.state.showState } />
-                </div>
+                    { (this.state.showState) && <Graph />}
+                        </div>
             </div>
         );
     }
