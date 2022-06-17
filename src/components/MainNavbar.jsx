@@ -9,51 +9,135 @@ import { Link, NavLink } from "react-router-dom";
 
 import ModalPopup from "./ModalPopup";
 import { IHome, ICategory, IIncome, ICosts, ISettings, ILogout, ILogin, IRegistration } from "./Icons";
+import Modal from 'react-bootstrap/Modal';
+import {useSession} from "../utilites/Session.jsx";
+import {NotificationManager} from 'react-notifications';
 
 
-function RegisterForm() {
+function RegisterForm(handleHide) {
+    const {signup} = useSession();
+    const [password, setPassword] = useState("");
+    const [email, setEmail] = useState("");
+    const [passwordConfirmation, setPasswordConfirmation] = useState("");
+    const emailRegex = /^\S+@\S+$/;
+
+    const handleEmailChange = (e) => {
+        setEmail(e.target.value);
+    };
+
+    const handlePasswordChange = (e) => {
+        setPassword(e.target.value);
+    };
+
+    const handlePasswordConfirmationChange = (e) => {
+        setPasswordConfirmation(e.target.value);
+    };
+    const clearData = () =>{
+        setEmail("")
+        setPasswordConfirmation("")
+        setPassword("")
+    }
+    const handleSubmit = () => {
+        if (password !== passwordConfirmation) {
+            NotificationManager.error("Password and Password Confirmation should match", "Password Error")
+        } else if (password.length < 6)
+        {
+            NotificationManager.error("Password should have more then or equal 6 symbols", "Password Error")
+        }
+        else if(!email.match(emailRegex)){
+            NotificationManager.error("Email should be like example@test.com", "Email Error")
+        }
+        else {
+            signup({email: email, password: password, confirmation_password: passwordConfirmation}).then(clearData).then(handleHide()).then(
+                NotificationManager.success("Registration Success", "Welcome")
+            )
+        }
+    };
+
     return (
         <>
-            <Form.Group className="mb-3" controlId="formRegisterEmail">
-                <Form.Label>Email address</Form.Label>
-                <Form.Control type="email" placeholder="Enter email" />
-            </Form.Group>
+            <Modal.Body>
+                <Form.Group className="mb-3" controlId="formRegisterEmail">
+                    <Form.Label>Email address</Form.Label>
+                    <Form.Control type="email" placeholder="Enter email" value={email} onChange={handleEmailChange}/>
+                </Form.Group>
 
-            <Form.Group className="mb-3" controlId="formRegisterPassword">
-                <Form.Label>Password</Form.Label>
-                <Form.Control type="password" placeholder="Password" />
-            </Form.Group>
+                <Form.Group className="mb-3" controlId="formRegisterPassword">
+                    <Form.Label>Password</Form.Label>
+                    <Form.Control type="password" placeholder="Password" value={password} onChange={handlePasswordChange}/>
+                </Form.Group>
 
-            <Form.Group className="mb-3" controlId="formRegisterPasswordConfirmation">
-                <Form.Label>Confirm Password</Form.Label>
-                <Form.Control type="password" placeholder="Repeat Password" />
-            </Form.Group>
+                <Form.Group className="mb-3" controlId="formRegisterPasswordConfirmation">
+                    <Form.Label>Confirm Password</Form.Label>
+                    <Form.Control type="password" placeholder="Repeat Password" value={passwordConfirmation} onChange={handlePasswordConfirmationChange}/>
+                </Form.Group>
+            </Modal.Body>
+            <Modal.Footer className='d-flex justify-content-center'>
+                <Button className='popup-btn col-4 py-2' onClick={ handleSubmit }>
+                    Sign Up
+                </Button>
+            </Modal.Footer>
         </>
     )
 }
 
 
-function LoginForm() {
+function LoginForm(handleHide) {
+    const {login} = useSession();
+    const [password, setPassword] = useState("");
+    const [email, setEmail] = useState("");
+    const emailRegex = /^\S+@\S+$/;
+
+    const handleEmailChange = (e) => {
+        setEmail(e.target.value);
+    };
+
+    const handlePasswordChange = (e) => {
+        setPassword(e.target.value);
+    }
+
+    const clearData = () =>{
+        setEmail("")
+        setPassword("")
+    }
+
+    const handleSubmit = () => {
+        if (password.length < 0)
+        {
+            NotificationManager.error("Password must present", "Password Error")
+        }
+        else if(!email.match(emailRegex)){
+            NotificationManager.error("Email should be like example@test.com", "Email Error")
+        }
+        else {
+            login({email: email, password: password}).then(clearData).then(handleHide()).then(NotificationManager.success("Login Success", "Welcome"))
+        }
+    };
     return (
         <>
-            <Form.Group className="mb-3" controlId="formLoginEmail">
-                <Form.Label>Email address</Form.Label>
-                <Form.Control type="email" placeholder="Enter email" />
-            </Form.Group>
+            <Modal.Body>
+                <Form.Group className="mb-3" controlId="formLoginEmail">
+                    <Form.Label>Email address</Form.Label>
+                    <Form.Control type="email" placeholder="Enter email" onChange={handleEmailChange} />
+                </Form.Group>
 
-            <Form.Group className="mb-3" controlId="fromLoginPassword">
-                <Form.Label>Password</Form.Label>
-                <Form.Control type="password" placeholder="Password" />
-            </Form.Group>
-            <Form.Group className="mb-3" controlId="formBasicCheckbox">
-                <Form.Check type="checkbox" label="Check me out" />
-            </Form.Group>
+                <Form.Group className="mb-3" controlId="fromLoginPassword">
+                    <Form.Label>Password</Form.Label>
+                    <Form.Control type="password" placeholder="Password" onChange={handlePasswordChange}/>
+                </Form.Group>
+            </Modal.Body>
+            <Modal.Footer className='d-flex justify-content-center'>
+                <Button className='popup-btn col-4 py-2' onClick={handleSubmit}>
+                    Log In
+                </Button>
+            </Modal.Footer>
         </>
     )
 }
 
 
 function NavbarMenu(props) {
+    const {user, logout} = useSession()
     return (
         <Navbar className="c-navbar d-flex align-items-start" variant="dark">
             <div className="d-flex flex-column ">
@@ -77,27 +161,27 @@ function NavbarMenu(props) {
                     <NavLink to='/costs' className='nav-link d-flex align-items-center'>
                         <ICosts width='24' height='24' /><span>Costs</span>
                     </NavLink>
-
+                    {user &&
                     <NavLink to='/settings' className='nav-link d-flex align-items-center'>
                         <ISettings width='24' height='24' /><span>Settings</span>
-                    </NavLink>
-
-                    <Button type='button' className='nav-link d-flex align-items-center'>
+                    </NavLink> }
+                    {user &&
+                    <Button type='button' className='nav-link d-flex align-items-center' onClick={logout}>
                         <ILogout width='24' height='24' /><span>Log Out</span>
-                    </Button>
+                    </Button>}
 
-                    <div className='d-flex flex-column mt-5 pt-5'>
-                        <span className='opacity-50'>test links (pls ignore)</span>
-                        <ModalPopup buttonClassName='nav-link' buttonTitle='Register'
-                                    buttonIcon={ <IRegistration width='24' height='24' /> }
-                                    modalBody={ < RegisterForm /> }
-                                    modalTitle='Registration' modalButtonTitle='Register'/>
-                        <ModalPopup buttonClassName='nav-link' buttonTitle='Log In'
-                                    buttonIcon={ <ILogin width='24' height='24' /> }
-                                    modalBody={ < LoginForm /> }
-                                    modalTitle='Log In' modalButtonTitle='Log In'/>
 
-                    </div>
+                    {!user &&
+                        <div className='d-flex flex-column mt-5 pt-5'>
+                            <ModalPopup buttonClassName='nav-link' buttonTitle='Register'
+                                        buttonIcon={<IRegistration width='24' height='24'/>}
+                                        modalForm={RegisterForm}/>
+                            <ModalPopup buttonClassName='nav-link' buttonTitle='Log In'
+                                        buttonIcon={<ILogin width='24' height='24'/>}
+                                        modalForm={LoginForm}/>
+
+                        </div>
+                    }
                 </Nav>
 
             </div>

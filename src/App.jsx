@@ -11,11 +11,14 @@ import Costs from "./components/Costs";
 import Settings from "./components/Settings.jsx";
 import ApiProvider from "./utilites/ApiProvider.tsx";
 import Session from "./utilites/Session.jsx";
+import {NotificationContainer} from 'react-notifications';
+import 'react-notifications/lib/notifications.css';
 
 function App() {
   return (
           <ApiProvider>
               <Session>
+            <NotificationContainer />
             <Container className='d-flex py-3'>
                 <div className='col-lg-2 d-lg-flex d-block justify-content-between'>
                     <MainNavbar />

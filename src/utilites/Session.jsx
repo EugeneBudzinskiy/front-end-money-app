@@ -10,15 +10,15 @@ const Session = ({ children }) => {
     const api = useApi();
     const [user, setUser] = useState();
 
-    const emailRegex = /^\S+@\S+$/;
-
     const isAuthenticated = () => {
         return !!fetchToken();
     };
 
     const apiErrorHandler = (err) => {
-        if (err && err.response && err.response.data && err.response.data.message) {
-            return Promise.reject(err.response.data.message);
+        if (err && err.response && err.response.data) {
+            console.log(err.response.data.errors.email[0])
+            // NotificationManager.error(err.response.data.errors.email[0].toString, "");
+            return Promise.reject(err.response.data.errors.email[0])
         }
     };
 
@@ -29,24 +29,12 @@ const Session = ({ children }) => {
             writeToken(jwt);
         }
 
-        const newUser = { ...response.data.user };
+        const newUser = { ...response.data };
         setUser(newUser);
         return response.data;
     }, [writeToken, setUser]);
 
     const signup = ( {email, password, confirmation_password}) => {
-        if (
-            !email || !email.match(emailRegex)
-        ) {
-            return Promise.reject("Email is required");
-        }
-        if (!password) {
-            return Promise.reject("Password is required");
-        }
-        if (password !== confirmation_password) {
-            return Promise.reject("Password and confirmation password don't match");
-        }
-
         const authApi = api;
         return authApi.post(
                 "/signup",
@@ -64,15 +52,6 @@ const Session = ({ children }) => {
     };
 
     const login = ({ email, password }) => {
-        if (
-            !email || !email.match(emailRegex)
-        ) {
-            return Promise.reject("Email is required");
-        }
-        if (!password) {
-            return Promise.reject("Password is required");
-        }
-
         const authApi = api;
         return authApi
             .post(
@@ -90,12 +69,14 @@ const Session = ({ children }) => {
     };
 
     const logout = () => {
-        const authApi = api;
-        return authApi.delete("/logout(",).then(() => {
-            clearToken();
-            setUser(null);
-            return user;
-        });
+        setUser();
+        return clearToken();
+        // const authApi = api;
+        // return authApi.delete("/logout",).then(() => {
+        //     clearToken();
+        //     setUser(null);
+        //     return user;
+        // });
     };
 
     return (

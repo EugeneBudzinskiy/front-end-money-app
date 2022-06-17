@@ -30,13 +30,7 @@ function ModalPopup(props) {
                 </Modal.Header>
 
                 <Form>
-                    <Modal.Body>{ props.modalBody }</Modal.Body>
-
-                    <Modal.Footer className='d-flex justify-content-center'>
-                        <Button className='popup-btn col-4 py-2' onClick={ handleHide }>
-                            { props.modalButtonTitle }
-                        </Button>
-                    </Modal.Footer>
+                    {props.modalForm(handleHide)}
                 </Form>
 
             </Modal>
