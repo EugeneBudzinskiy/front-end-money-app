@@ -1,10 +1,88 @@
 import './Home.css';
 
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 
 import ToggleGraph from './ToggleGraph'
 import { IArrowUp, IArrowDown } from "./Icons";
+import {useApi} from "../utilites/ApiProvider.tsx";
+import {NotificationManager} from 'react-notifications';
+import {useSession} from "../utilites/Session.jsx";
 
+const RecentTransactions = () => {
+    const {isAuthenticated} = useSession()
+    const [loginMessage, setLoginMessage] = useState(true)
+    const [transactions, setTransactions] = useState([]);
+    const [isLoadedTransaction, setIsLoadedTransaction] = useState(false);
+    const api = useApi()
+    const handleResponse = (response) => {
+        const transactionsForTheseUser = response.data.map(
+            (transaction) => ({
+                ...transaction,
+                type: `${transaction["type"]}`,
+                currency: `${transaction["currency"]}`,
+                category: `${transaction["category"]}`,
+                comment: `${transaction["comment"]}`,
+                date: `${transaction["date"]}`,
+                amount: `${transaction["amount"]}`,
+            })
+        );
+
+        setTransactions(transactionsForTheseUser);
+        console.log(transactions)
+        setIsLoadedTransaction(true);
+    };
+
+    useEffect(() => {
+        if (!isAuthenticated() && loginMessage){
+            NotificationManager.info("Log in please to see your data", "Log In Please")
+            setLoginMessage(false)
+        }
+        if (!isLoadedTransaction) {
+            api.get(`/v1/statistic/recent_transactions`).then((response) => {
+                handleResponse(response);
+            });
+        }
+    }, [transactions]);
+
+    return(
+        <>
+            {transactions.map((transaction) => (
+                <div className='row g-0 py-2'>
+                    <div className='col-lg col-sm-9 col-8 order-lg-0 order-0 d-flex title'>
+                            {transaction.type === "income"&&
+                                <div className='arrow me-2 text-success'>
+                                    <IArrowUp />
+                                </div>}
+                            {transaction.type === "cost" &&
+                                <div className='arrow me-2 text-danger'>
+                                    <IArrowDown />
+                                </div>
+                            }
+
+                        <span>{transaction.category}</span>
+                    </div>
+                    <div className='col-lg col-sm-9 col-8 order-lg-1 order-2 ps-lg-0 px-2 comment'>
+                        {transaction.comment === "null" && <span className='no-comment'>"No comment"</span>}{transaction.comment !== "null" && transaction.comment}
+                    </div>
+                    <div className='col-md-2 col-sm-3 col-4 order-lg-2 order-3 date'>{transaction.date}</div>
+                    {transaction.type === "income"&&
+                        <div className='col-md-2 col-sm-3 col-4 order-lg-3 order-1 amount text-success'>
+                            <span className='sign'>+</span>
+                            <span className='value me-1'>{transaction.amount}</span>
+                            <span className='currency'>{transaction.currency}</span>
+                        </div>
+                    }
+                    {transaction.type === "cost"&&
+                        <div className='col-md-2 col-sm-3 col-4 order-lg-3 order-1 amount text-danger'>
+                            <span className='sign'>-</span>
+                            <span className='value me-1'>{transaction.amount}</span>
+                            <span className='currency'>{transaction.currency}</span>
+                        </div>
+                    }
+                </div>
+            ))}
+        </>)
+};
 
 class Home extends React.Component {
     render() {
@@ -22,44 +100,7 @@ class Home extends React.Component {
                     <div className='content'>
                         <div className='table-header mb-1'>Recent transactions</div>
                         <div className='table-content'>
-
-                            <div className='row g-0 py-2'>
-                                <div className='col-lg col-sm-9 col-8 order-lg-0 order-0 d-flex title'>
-                                    <div className='arrow me-2 text-success'>
-                                        <IArrowUp />
-                                    </div>
-                                    <span>Savings</span>
-                                </div>
-                                <div className='col-lg col-sm-9 col-8 order-lg-1 order-2 ps-lg-0 px-2 comment'>
-                                    <span className='no-comment'>No comment</span>
-                                </div>
-                                <div className='col-md-2 col-sm-3 col-4 order-lg-2 order-3 date'>30.01.2001</div>
-                                <div className='col-md-2 col-sm-3 col-4 order-lg-3 order-1 amount text-success'>
-                                    <span className='sign'>+</span>
-                                    <span className='value me-1'>123</span>
-                                    <span className='currency'>$</span>
-                                </div>
-                            </div>
-
-                            <div className='row g-0 py-2'>
-                                <div className='col-lg col-sm-9 col-8 order-lg-0 order-0 d-flex title'>
-                                    <div className='arrow me-2 text-danger'>
-                                        <IArrowDown />
-                                    </div>
-                                    <span>Restaurant</span>
-                                </div>
-                                <div className='col-lg col-sm-9 col-8 order-lg-1 order-2 ps-lg-0 px-2 comment'>
-                                    Lorem ipsum dolor sit amet, consectetur adipiscing elit,
-                                    sed do eiusmod tempor incididunt et dolore magna aliqua.
-                                </div>
-                                <div className='col-md-2 col-sm-3 col-4 order-lg-2 order-3 date'>30.01.2001</div>
-                                <div className='col-md-2 col-sm-3 col-4 order-lg-3 order-1 amount text-danger'>
-                                    <span className='sign'>-</span>
-                                    <span className='value me-1'>123</span>
-                                    <span className='currency'>$</span>
-                                </div>
-                            </div>
-
+                        < RecentTransactions />
                         </div>
                     </div>
                 </div>
