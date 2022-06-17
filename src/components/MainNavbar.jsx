@@ -137,7 +137,7 @@ function LoginForm(handleHide) {
 
 
 function NavbarMenu(props) {
-    const {user, logout} = useSession()
+    const {isAuthenticated, logout} = useSession()
     return (
         <Navbar className="c-navbar d-flex align-items-start" variant="dark">
             <div className="d-flex flex-column ">
@@ -161,17 +161,17 @@ function NavbarMenu(props) {
                     <NavLink to='/costs' className='nav-link d-flex align-items-center'>
                         <ICosts width='24' height='24' /><span>Costs</span>
                     </NavLink>
-                    {user &&
+                    {isAuthenticated() &&
                     <NavLink to='/settings' className='nav-link d-flex align-items-center'>
                         <ISettings width='24' height='24' /><span>Settings</span>
                     </NavLink> }
-                    {user &&
+                    {isAuthenticated() &&
                     <Button type='button' className='nav-link d-flex align-items-center' onClick={logout}>
                         <ILogout width='24' height='24' /><span>Log Out</span>
                     </Button>}
 
 
-                    {!user &&
+                    {!isAuthenticated() &&
                         <div className='d-flex flex-column mt-5 pt-5'>
                             <ModalPopup buttonClassName='nav-link' buttonTitle='Register'
                                         buttonIcon={<IRegistration width='24' height='24'/>}
