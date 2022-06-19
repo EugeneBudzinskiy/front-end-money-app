@@ -23,6 +23,7 @@ const Session = ({ children }) => {
     };
 
     const handleSession = useCallback((response) => {
+        console.log(response.headers);
         if (response.headers.authorization) {
             const jwt = response.headers.authorization.replace("Bearer ", "");
 
@@ -69,8 +70,9 @@ const Session = ({ children }) => {
     };
 
     const logout = () => {
-        setUser();
-        return clearToken();
+        setUser(null);
+        clearToken();
+        return user
         // const authApi = api;
         // return authApi.delete("/logout",).then(() => {
         //     clearToken();

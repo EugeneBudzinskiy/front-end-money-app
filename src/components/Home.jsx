@@ -37,7 +37,7 @@ const RecentTransactions = () => {
             NotificationManager.info("Log in please to see your data", "Log In Please")
             setLoginMessage(false)
         }
-        if (!isLoadedTransaction) {
+        if (!isLoadedTransaction || (isAuthenticated() && transactions.length <= 0)) {
             api.get(`/v1/statistic/recent_transactions`).then((response) => {
                 handleResponse(response);
             });
