@@ -26,7 +26,8 @@ const ChangePasswordView = () => {
         {
             NotificationManager.error("Password should have more then or equal 6 symbols", "Password Error")
         } else {
-            return api.put(`/v1/users/update_profile`, {password: password}).then(NotificationManager.success("Password update was successful.", "Password Update"))
+            return api.put(`/v1/users/update_profile`, {password: password})
+                .then(NotificationManager.success("Password update was successful.", "Password Update"))
         }
     }
     return (
@@ -39,15 +40,18 @@ const ChangePasswordView = () => {
                                                     justify-content-center align-items-center '>
                             <Form.Group className="col-xl-3 col-md-4 col-sm-6 col-8 mx-2 mx-xl-3"
                                         controlId="changePassword">
-                                <Form.Control type="password" placeholder="New password" onChange={handlePasswordChange}/>
+                                <Form.Control type="password" placeholder="New password"
+                                              onChange={handlePasswordChange}/>
                             </Form.Group>
 
                             <Form.Group className="col-xl-3 col-md-4 col-sm-6 col-8 mx-2 mx-xl-3 my-md-0 my-3 "
                                         controlId="changePasswordConfirmation">
-                                <Form.Control type="password" placeholder="Repeat new password" onChange={handlePasswordConfirmationChange}/>
+                                <Form.Control type="password" placeholder="Repeat new password"
+                                              onChange={handlePasswordConfirmationChange}/>
                             </Form.Group>
 
-                            <Button type="submit" className='col-md-2 col-sm-3 col-4 mx-xl-3 mx-2' onClick={onSubmit}>Change</Button>
+                            <Button type="submit" className='col-md-2 col-sm-3 col-4 mx-xl-3 mx-2'
+                                    onClick={onSubmit}>Change</Button>
 
                         </div>
                     </Form>
@@ -66,11 +70,13 @@ const ChangeCurrencyView = () => {
     };
 
     const onSubmit = () => {
-        return api.put(`/v1/users/update_profile`, {currency: currency}).then(NotificationManager.success("Currency update was successful.", "Currency Update"))
+        return api.put(`/v1/users/update_profile`, {currency: currency})
+            .then(NotificationManager.success("Currency update was successful.", "Currency Update"))
     }
 
     const currentCurrency = () => {
-         api.get(`/v1/users/user_details`).then((response) => setCurrency(response.data["currency"]))
+         api.get(`/v1/users/user_details`)
+             .then((response) => setCurrency(response.data["currency"]))
     }
     useEffect(() => {
         if (currency === false){
@@ -88,10 +94,12 @@ const ChangeCurrencyView = () => {
                         <div className='d-flex justify-content-center py-2'>
                             <Form.Group className="col-xl-2 col-md-3 col-sm-4 col-5 mx-xl-3 mx-2"
                                         controlId="changeCurrency">
-                                <Form.Control type="text" placeholder="Currency" value={currency} onChange={handleCurrencyChange}/>
+                                <Form.Control type="text" placeholder="Currency" value={currency}
+                                              onChange={handleCurrencyChange}/>
                             </Form.Group>
 
-                            <Button type="submit" className='col-xl-2 col-md-2 col-sm-3 col-4 mx-xl-3 mx-2' onClick={onSubmit}>
+                            <Button type="submit" className='col-xl-2 col-md-2 col-sm-3 col-4 mx-xl-3 mx-2'
+                                    onClick={onSubmit}>
                                 Change
                             </Button>
 

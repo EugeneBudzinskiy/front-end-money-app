@@ -56,20 +56,26 @@ function RegisterForm(handleHide) {
 
     return (
         <>
+            <Modal.Header closeButton closeVariant='white'>
+                <Modal.Title>Registration</Modal.Title>
+            </Modal.Header>
             <Modal.Body>
                 <Form.Group className="mb-3" controlId="formRegisterEmail">
                     <Form.Label>Email address</Form.Label>
-                    <Form.Control type="email" placeholder="Enter email" value={email} onChange={handleEmailChange}/>
+                    <Form.Control type="email" placeholder="Enter email" value={email}
+                                  onChange={handleEmailChange}/>
                 </Form.Group>
 
                 <Form.Group className="mb-3" controlId="formRegisterPassword">
                     <Form.Label>Password</Form.Label>
-                    <Form.Control type="password" placeholder="Password" value={password} onChange={handlePasswordChange}/>
+                    <Form.Control type="password" placeholder="Password" value={password}
+                                  onChange={handlePasswordChange}/>
                 </Form.Group>
 
                 <Form.Group className="mb-3" controlId="formRegisterPasswordConfirmation">
                     <Form.Label>Confirm Password</Form.Label>
-                    <Form.Control type="password" placeholder="Repeat Password" value={passwordConfirmation} onChange={handlePasswordConfirmationChange}/>
+                    <Form.Control type="password" placeholder="Repeat Password" value={passwordConfirmation}
+                                  onChange={handlePasswordConfirmationChange}/>
                 </Form.Group>
             </Modal.Body>
             <Modal.Footer className='d-flex justify-content-center'>
@@ -110,11 +116,15 @@ function LoginForm(handleHide) {
             NotificationManager.error("Email should be like example@test.com", "Email Error")
         }
         else {
-            login({email: email, password: password}).then(clearData).then(handleHide()).then(NotificationManager.success("Login Success", "Welcome"))
+            login({email: email, password: password}).then(clearData).then(handleHide())
+                .then(NotificationManager.success("Login Success", "Welcome"))
         }
     };
     return (
         <>
+            <Modal.Header closeButton closeVariant='white'>
+                <Modal.Title>Login</Modal.Title>
+            </Modal.Header>
             <Modal.Body>
                 <Form.Group className="mb-3" controlId="formLoginEmail">
                     <Form.Label>Email address</Form.Label>
@@ -128,7 +138,7 @@ function LoginForm(handleHide) {
             </Modal.Body>
             <Modal.Footer className='d-flex justify-content-center'>
                 <Button className='popup-btn col-4 py-2' onClick={handleSubmit}>
-                    Log In
+                    Sign In
                 </Button>
             </Modal.Footer>
         </>
@@ -172,7 +182,7 @@ function NavbarMenu(props) {
 
 
                     {!isAuthenticated() &&
-                        <div className='d-flex flex-column mt-5 pt-5'>
+                        <div className='d-flex flex-column'>
                             <ModalPopup buttonClassName='nav-link' buttonTitle='Register'
                                         buttonIcon={<IRegistration width='24' height='24'/>}
                                         modalForm={RegisterForm}/>

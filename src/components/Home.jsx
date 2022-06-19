@@ -28,7 +28,7 @@ const RecentTransactions = () => {
         );
 
         setTransactions(transactionsForTheseUser);
-        console.log(transactions)
+        console.log(response)
         setIsLoadedTransaction(true);
     };
 
@@ -37,7 +37,7 @@ const RecentTransactions = () => {
             NotificationManager.info("Log in please to see your data", "Log In Please")
             setLoginMessage(false)
         }
-        if (!isLoadedTransaction || (isAuthenticated() && transactions.length <= 0)) {
+        if (!isLoadedTransaction && isAuthenticated() && transactions.length <= 0) {
             api.get(`/v1/statistic/recent_transactions`).then((response) => {
                 handleResponse(response);
             });
@@ -46,7 +46,7 @@ const RecentTransactions = () => {
 
     return(
         <>
-            {transactions.map((transaction) => (
+            {isAuthenticated() && transactions.length > 0 && transactions.map((transaction) => (
                 <div className='row g-0 py-2'>
                     <div className='col-lg col-sm-9 col-8 order-lg-0 order-0 d-flex title'>
                             {transaction.type === "income"&&
@@ -62,7 +62,8 @@ const RecentTransactions = () => {
                         <span>{transaction.category}</span>
                     </div>
                     <div className='col-lg col-sm-9 col-8 order-lg-1 order-2 ps-lg-0 px-2 comment'>
-                        {transaction.comment === "null" && <span className='no-comment'>"No comment"</span>}{transaction.comment !== "null" && transaction.comment}
+                        {transaction.comment === "null" && <span className='no-comment'>"No comment"</span>}
+                        {transaction.comment !== "null" && transaction.comment}
                     </div>
                     <div className='col-md-2 col-sm-3 col-4 order-lg-2 order-3 date'>{transaction.date}</div>
                     {transaction.type === "income"&&
@@ -81,6 +82,16 @@ const RecentTransactions = () => {
                     }
                 </div>
             ))}
+            {isAuthenticated() && transactions.length <= 0 &&
+                <div className="d-flex mt-5 justify-content-center">
+                    <span className="no-data-found">No Data Found</span>
+                </div>
+            }
+            {!isAuthenticated() &&
+                <div className="d-flex mt-5 justify-content-center">
+                    <span className="non-user">Sign In or Sing Up to see Data</span>
+                </div>
+            }
         </>)
 };
 
@@ -100,7 +111,7 @@ class Home extends React.Component {
                     <div className='content'>
                         <div className='table-header mb-1'>Recent transactions</div>
                         <div className='table-content'>
-                        < RecentTransactions />
+                            <RecentTransactions />
                         </div>
                     </div>
                 </div>

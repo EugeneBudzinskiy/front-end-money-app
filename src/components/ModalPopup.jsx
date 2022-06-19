@@ -4,12 +4,6 @@ import Modal from 'react-bootstrap/Modal';
 import Form from 'react-bootstrap/Form';
 
 
-function DeleteConfirmForm() {
-    return (
-        <div>Are you sure?<br></br>Please confirm this action.</div>
-    )
-}
-
 
 function ModalPopup(props) {
     const [showFlag, setShowFlag] = useState(false);
@@ -25,12 +19,9 @@ function ModalPopup(props) {
             </Button>
 
             <Modal size={ props.modalSize } centered show={ showFlag } onHide={ handleHide }>
-                <Modal.Header closeButton closeVariant='white'>
-                    <Modal.Title>{ props.modalTitle }</Modal.Title>
-                </Modal.Header>
 
                 <Form>
-                    {props.modalForm(handleHide)}
+                    {props.modalForm({handleHide: handleHide, data: props.data})}
                 </Form>
 
             </Modal>
@@ -40,4 +31,3 @@ function ModalPopup(props) {
 
 }
 export default ModalPopup;
-export { DeleteConfirmForm };
