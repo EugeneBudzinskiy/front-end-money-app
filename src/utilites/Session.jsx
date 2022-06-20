@@ -1,6 +1,7 @@
 import React, { useCallback, useContext, useState } from "react";
 import { useApi } from "./ApiProvider.tsx";
 import useSessionTokenManager from "./useSessionTokenManager";
+import {NotificationManager} from "react-notifications";
 
 const SessionContext = React.createContext();
 
@@ -18,10 +19,9 @@ const Session = ({ children }) => {
     };
 
     const apiErrorHandler = (err) => {
-        if (err && err.response && err.response.data) {
-            console.log(err.response.data.errors.email[0])
-            // NotificationManager.error(err.response.data.errors.email[0].toString, "");
-            return Promise.reject(err.response.data.errors.email[0])
+        if (err && err.response && err.response.data && err.response.status >= 400) {
+            NotificationManager.error("Something went wrong Please Check Your data or call to support", `ERROR ${err.response.status}`);
+            return Promise.reject(err)
         }
     };
 
