@@ -84,7 +84,6 @@ const ChangeCurrencyView = () => {
             }
         }, [currency]
     )
-    console.log(currency)
     return (
         <>
             <div className='content-block mb-4 pb-4'>

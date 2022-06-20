@@ -2,7 +2,7 @@ import './Costs.css';
 
 import React, {useEffect, useState} from 'react';
 import Form from "react-bootstrap/Form";
-
+import Checkbox from "@material-ui/core/Checkbox";
 import { IDelete, IEdit } from "./Icons";
 import ModalPopup from "./ModalPopup";
 import {useApi} from "../utilites/ApiProvider.tsx";
@@ -11,16 +11,67 @@ import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button";
 import {useSession} from "../utilites/Session";
 
+function AutocompleteCategories(setCategory,defaultCategory, api) {
+    // const [search, setSearch] = useState(defaultCategory || "");
+    // const [options, setOptions] = useState(['Cost','Blabla']);
+    // const [initialFetchStarted, setInitialFetchStarted] = useState(false);
+    // const [typingTimeout, setTypingTimout] = useState(0);
+    //
+    // const searchOptions = (evt) => {
+    //     if (typingTimeout) {
+    //         clearTimeout(typingTimeout);
+    //     }
+    //     setSearch(evt.target.value);
+    // };
+    //
+    // useEffect(() => {
+    //     setTypingTimout(setTimeout(fetchOptions, 1000));
+    // }, [search]);
+    //
+    // const fetchOptions = () => {
+    //     let params = {};
+    //     if (search && search !== "") {
+    //         params = {
+    //             name_like: search
+    //         };
+    //     }
+    //     // api.get(`/v1/categories`).then((response) => {
+    //     //     setOptions(response.categories.map((r) => {return r.name;}));
+    //     // });
+    // };
+    //
+    // if (options.length === 0 && !initialFetchStarted) {
+    //     fetchOptions();
+    //     setInitialFetchStarted(true);
+    // }
+    // return (
+    //     <>
+    //         <Form.Control
+    //                 value={search}
+    //                 onChange={searchOptions}
+    //         />
+    //             {options.map((option, index) => {
+    //                 let isChecked = (search===option)
+    //                 return (
+    //                     <div key={index}>
+    //                         <Checkbox
+    //                             val={option}
+    //                             checked={isChecked}
+    //                             onClick={() => setCategory(option)}
+    //                         />
+    //                         {option}
+    //                     </div>
+    //                 );
+    //             })}
+    //     </>
+    // );
+}
 
 function CostsAddForm(props) {
     const api = useApi();
     const [category, setCategory] = useState("");
     const [amount, setAmount] = useState("");
     const [comment, setComment] = useState("");
-
-    const handleCategoryChange = (e) => {
-        setCategory(e.target.value);
-    };
 
     const handleAmountChange = (e) => {
         setAmount(e.target.value);
@@ -35,10 +86,40 @@ function CostsAddForm(props) {
         setAmount("");
         setComment("");
     }
+    const [options, setOptions] = useState(['Cost','Blabla']);
+    const [initialFetchStarted, setInitialFetchStarted] = useState(false);
+    const [typingTimeout, setTypingTimout] = useState(0);
+
+    const searchOptions = (evt) => {
+        if (typingTimeout) {
+            clearTimeout(typingTimeout);
+        }
+        setCategory(evt.target.value);
+    };
+
+    useEffect(() => {
+        setTypingTimout(setTimeout(fetchOptions, 1000));
+    }, [category]);
+
+    const fetchOptions = () => {
+        let params = {};
+        if (category && category !== "") {
+            params = {
+                name_like: category
+            };
+        }
+        api.get(`/v1/categories/search`, {params}).then((response) => {
+            setOptions(response.data.categories.map((r) => {return r.name;}));
+        });
+    };
+
+    if (options.length === 0 && !initialFetchStarted) {
+        fetchOptions();
+        setInitialFetchStarted(true);
+    }
 
     const handleSubmit = () => {
-        // TODO Fix `costs` route it doesn't have create stuff. Or tell me other way to do this))
-        api.post('v1/costs',{category: category, amount: amount, comment: comment})
+        api.post('/v1/costs',{category_name: category, amount: amount, cost_description: comment})
             .then(clearData).then(props.handleHide).then(
             NotificationManager.success("New Costs was added", "Success!")
         )
@@ -50,11 +131,6 @@ function CostsAddForm(props) {
                 <Modal.Title>Add new Costs</Modal.Title>
             </Modal.Header>
             <Modal.Body>
-                <Form.Group className="mb-3" controlId="categoryCosts">
-                    <Form.Control type="text" placeholder="Category name" value={ category }
-                                  onChange={ handleCategoryChange }/>
-                </Form.Group>
-
                 <Form.Group className="mb-3" controlId="commentICosts">
                     <Form.Control type="text" placeholder="Comment" value={ comment }
                                   onChange={ handleCommentChange }/>
@@ -63,6 +139,26 @@ function CostsAddForm(props) {
                 <Form.Group className="mb-3" controlId="amountICosts">
                     <Form.Control type="text" placeholder="Amount" value={ amount }
                                   onChange={ handleAmountChange }/>
+                </Form.Group>
+                <Form.Group className="mb-3" controlId="commentICosts">
+
+                <Form.Control
+                    value={category}
+                    onChange={searchOptions}
+                />
+                {options.map((option, index) => {
+                    let isChecked = (category===option)
+                    return (
+                        <div key={index}>
+                            <Checkbox
+                                val={option}
+                                checked={isChecked}
+                                onClick={() => setCategory(option)}
+                            />
+                            {option}
+                        </div>
+                    );
+                })}
                 </Form.Group>
             </Modal.Body>
             <Modal.Footer className='d-flex justify-content-center'>
@@ -80,10 +176,6 @@ function CostsEditForm(props) {
     const [amount, setAmount] = useState(props.data.amount);
     const [comment, setComment] = useState(props.data.comment);
 
-    const handleCategoryChange = (e) => {
-        setCategory(e.target.value);
-    };
-
     const handleAmountChange = (e) => {
         setAmount(e.target.value);
     };
@@ -93,22 +185,48 @@ function CostsEditForm(props) {
     };
 
     const handleSubmit = () => {
-        api.put('v1/costs/' + props.data.id,{category: category, amount: amount, comment: comment})
+        api.put('/v1/costs/' + props.data.id,{category_name: category, amount: amount, cost_description: comment})
             .then(props.handleHide).then(
-            NotificationManager.success("New Costs was added", "Success!")
+            NotificationManager.success("The Cost was updated!", "Success!")
         )
     };
+    const [options, setOptions] = useState(['Cost','Blabla']);
+    const [initialFetchStarted, setInitialFetchStarted] = useState(false);
+    const [typingTimeout, setTypingTimout] = useState(0);
 
+    const searchOptions = (evt) => {
+        if (typingTimeout) {
+            clearTimeout(typingTimeout);
+        }
+        setCategory(evt.target.value);
+    };
+
+    useEffect(() => {
+        setTypingTimout(setTimeout(fetchOptions, 1000));
+    }, [category]);
+
+    const fetchOptions = () => {
+        let params = {};
+        if (category && category !== "") {
+            params = {
+                name_like: category
+            };
+        }
+        api.get(`/v1/categories/search`, {params}).then((response) => {
+            setOptions(response.data.categories.map((r) => {return r.name;}));
+        });
+    };
+
+    if (options.length === 0 && !initialFetchStarted) {
+        fetchOptions();
+        setInitialFetchStarted(true);
+    }
     return (
         <>
             <Modal.Header closeButton closeVariant='white'>
                 <Modal.Title>Edit Costs</Modal.Title>
             </Modal.Header>
             <Modal.Body>
-                <Form.Group className="mb-3" controlId="categoryIncome">
-                    <Form.Control type="text" placeholder="Category name" value={ category }
-                                  onChange={ handleCategoryChange }/>
-                </Form.Group>
 
                 <Form.Group className="mb-3" controlId="commentIncome">
                     <Form.Control type="text" placeholder="Comment" value={ comment === 'null' ? "" : comment }
@@ -118,6 +236,26 @@ function CostsEditForm(props) {
                 <Form.Group className="mb-3" controlId="amountIncome">
                     <Form.Control type="text" placeholder="Amount" value={ amount }
                                   onChange={ handleAmountChange }/>
+                </Form.Group>
+                <Form.Group className="mb-3" controlId="commentICosts">
+
+                    <Form.Control
+                        value={category}
+                        onChange={searchOptions}
+                    />
+                    {options.map((option, index) => {
+                        let isChecked = (category===option)
+                        return (
+                            <div key={index}>
+                                <Checkbox
+                                    val={option}
+                                    checked={isChecked}
+                                    onClick={() => setCategory(option)}
+                                />
+                                {option}
+                            </div>
+                        );
+                    })}
                 </Form.Group>
             </Modal.Body>
             <Modal.Footer className='d-flex justify-content-center'>
@@ -166,8 +304,8 @@ const GetCosts = () => {
         const costsForTheseUser = response.data.costs.map(
             (cost) => ({
                 ...cost,
-                category: `${cost["category"]}`,
-                comment: `${cost["comment"]}`,
+                category: `${cost["category_name"]}`,
+                comment: `${cost["cost_description"]}`,
                 amount: `${cost["amount"]}`,
                 currency: `${cost["currency"]}`,
             })
