@@ -117,12 +117,14 @@ function CostsAddForm(props) {
         fetchOptions();
         setInitialFetchStarted(true);
     }
-
+    function refreshPage() {
+        window.location.reload();
+    }
     const handleSubmit = () => {
         api.post('/v1/costs',{category_name: category, amount: amount, cost_description: comment})
             .then(clearData).then(props.handleHide).then(
             NotificationManager.success("New Costs was added", "Success!")
-        )
+        ).then(()=>refreshPage())
     };
 
     return (
@@ -175,7 +177,9 @@ function CostsEditForm(props) {
     const [category, setCategory] = useState(props.data.category);
     const [amount, setAmount] = useState(props.data.amount);
     const [comment, setComment] = useState(props.data.comment);
-
+    function refreshPage() {
+        window.location.reload();
+    }
     const handleAmountChange = (e) => {
         setAmount(e.target.value);
     };
@@ -188,7 +192,7 @@ function CostsEditForm(props) {
         api.put('/v1/costs/' + props.data.id,{category_name: category, amount: amount, cost_description: comment})
             .then(props.handleHide).then(
             NotificationManager.success("The Cost was updated!", "Success!")
-        )
+        ).then(()=>refreshPage())
     };
     const [options, setOptions] = useState(['Cost','Blabla']);
     const [initialFetchStarted, setInitialFetchStarted] = useState(false);
@@ -270,11 +274,13 @@ function CostsEditForm(props) {
 
 function CostsDeleteForm(props) {
     const api = useApi()
-
+    function refreshPage() {
+        window.location.reload();
+    }
     const handleSubmit = () => {
         api.delete('v1/costs/' + props.data.id).then(props.handleHide).then(
             NotificationManager.success("Chosen Costs was deleted", "Success!")
-        )
+        ).then(refreshPage)
     };
 
     return (

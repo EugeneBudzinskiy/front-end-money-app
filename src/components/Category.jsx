@@ -15,7 +15,9 @@ import {useSession} from "../utilites/Session";
 function CategoryAddForm(props) {
     const api = useApi()
     const [name, setName] = useState("");
-
+    function refreshPage() {
+        window.location.reload();
+    }
     const handleNameChange = (e) => {
         setName(e.target.value);
     };
@@ -25,7 +27,7 @@ function CategoryAddForm(props) {
     const handleSubmit = () => {
         api.post('v1/categories',{name: name}).then(clearData).then(props.handleHide).then(
             NotificationManager.success("New Category was added", "Success!")
-        )
+        ).then(()=> refreshPage())
     };
 
     return (
@@ -51,7 +53,9 @@ function CategoryAddForm(props) {
 function CategoryEditForm(props) {
     const api = useApi()
     const [name, setName] = useState(props.data.name);
-
+    function refreshPage() {
+        window.location.reload();
+    }
     const handleNameChange = (e) => {
         setName(e.target.value);
     };
@@ -63,7 +67,7 @@ function CategoryEditForm(props) {
         else {
             api.put('v1/categories/' + props.data.id,{name: name}).then(props.handleHide).then(
                 NotificationManager.success("New Category was added", "Success!")
-            )
+            ).then(()=> refreshPage())
         }
     };
 
@@ -90,11 +94,13 @@ function CategoryEditForm(props) {
 
 function CategoryDeleteForm(props) {
     const api = useApi()
-
+    function refreshPage() {
+        window.location.reload();
+    }
     const handleSubmit = () => {
         api.delete('v1/categories/' + props.data.id).then(props.handleHide).then(
             NotificationManager.success("Chosen Category was deleted", "Success!")
-        )
+        ).then(() => refreshPage())
     };
 
     return (

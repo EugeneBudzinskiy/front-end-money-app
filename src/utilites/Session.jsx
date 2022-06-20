@@ -10,6 +10,9 @@ const Session = ({ children }) => {
     const api = useApi();
     const [user, setUser] = useState();
 
+    function refreshPage() {
+        window.location.reload();
+    }
     const isAuthenticated = () => {
         return !!fetchToken();
     };
@@ -48,7 +51,7 @@ const Session = ({ children }) => {
                 },
             )
             .then(handleSession)
-            .then(() => setHasLoadedSession(true))
+            .then(() => setHasLoadedSession(true)).then(() => refreshPage())
             .catch(apiErrorHandler);
     };
 
@@ -65,13 +68,14 @@ const Session = ({ children }) => {
                 },
             )
             .then(handleSession)
-            .then(() => setHasLoadedSession(true))
+            .then(() => setHasLoadedSession(true)).then(() => refreshPage())
             .catch(apiErrorHandler);
     };
 
     const logout = () => {
         setUser(null);
         clearToken();
+        refreshPage()
         return user
         // const authApi = api;
         // return authApi.delete("/logout",).then(() => {

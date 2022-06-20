@@ -68,10 +68,13 @@ const ChangeCurrencyView = () => {
     const handleCurrencyChange = (e) => {
         setCurrency(e.target.value);
     };
+    function refreshPage() {
+        window.location.reload();
+    }
 
     const onSubmit = () => {
         return api.put(`/v1/users/update_profile`, {currency: currency})
-            .then(NotificationManager.success("Currency update was successful.", "Currency Update"))
+            .then(NotificationManager.success("Currency update was successful.", "Currency Update")).then(()=>refreshPage())
     }
 
     const currentCurrency = () => {

@@ -17,7 +17,9 @@ function IncomeAddForm(props) {
     const [source, setSource] = useState("");
     const [amount, setAmount] = useState("");
     const [comment, setComment] = useState("");
-
+    function refreshPage() {
+        window.location.reload();
+    }
     const handleSourceChange = (e) => {
         setSource(e.target.value);
     };
@@ -40,7 +42,7 @@ function IncomeAddForm(props) {
         api.post('v1/incomes',{source: source, amount: amount, comment: comment})
             .then(clearData).then(props.handleHide).then(
             NotificationManager.success("New Income was added", "Success!")
-        )
+        ).then(()=>refreshPage())
     };
 
     return (
@@ -91,12 +93,15 @@ function IncomeEditForm(props) {
     const handleCommentChange = (e) => {
         setComment(e.target.value);
     };
+    function refreshPage() {
+        window.location.reload();
+    }
 
     const handleSubmit = () => {
         api.put('v1/incomes/' + props.data.id,{source: source, amount: amount, comment: comment})
             .then(props.handleHide).then(
             NotificationManager.success("New Income was added", "Success!")
-        )
+        ).then(()=>refreshPage())
     };
 
     return (
@@ -132,11 +137,13 @@ function IncomeEditForm(props) {
 
 function IncomeDeleteForm(props) {
     const api = useApi()
-
+    function refreshPage() {
+        window.location.reload();
+    }
     const handleSubmit = () => {
         api.delete('v1/incomes/' + props.data.id).then(props.handleHide).then(
             NotificationManager.success("Chosen Income was deleted", "Success!")
-        )
+        ).then(()=>refreshPage())
     };
 
     return (
