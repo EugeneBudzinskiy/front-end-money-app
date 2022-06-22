@@ -6,7 +6,7 @@ import * as Qs from 'qs'
 import { useNavigate } from "react-router-dom";
 
 export const baseURL =
-    localStorage.getItem("REACT_APP_API_URL") || "https://boiling-waters-63998.herokuapp.com";
+    localStorage.getItem("REACT_APP_API_URL") || "https://boiling-waters-63998.herokuapp.com/api";
 
 
 export interface ApiInstance extends AxiosInstance {
